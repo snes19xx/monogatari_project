@@ -393,7 +393,7 @@ function runThemeEngines(theme) {
       setInterval(updateMayoiGreeting, 60000);
       break;
 
-    case "tsukihi":
+    case "tsukihi": {
       const SHAPE_4 =
         "M32.0,2.0L34.3,2.3L36.5,3.3L38.5,4.8L40.2,6.8L41.6,8.9L42.6,11.1L43.5,13.2L44.3,15.0L45.1,16.6L46.1,17.9L47.4,18.9L49.0,19.7L50.8,20.5L52.9,21.4L55.1,22.4L57.2,23.8L59.2,25.5L60.7,27.5L61.7,29.7L62.0,32.0L61.7,34.3L60.7,36.5L59.2,38.5L57.2,40.2L55.1,41.6L52.9,42.6L50.8,43.5L49.0,44.3L47.4,45.1L46.1,46.1L45.1,47.4L44.3,49.0L43.5,50.8L42.6,52.9L41.6,55.1L40.2,57.2L38.5,59.2L36.5,60.7L34.3,61.7L32.0,62.0L29.7,61.7L27.5,60.7L25.5,59.2L23.8,57.2L22.4,55.1L21.4,52.9L20.5,50.8L19.7,49.0L18.9,47.4L17.9,46.1L16.6,45.1L15.0,44.3L13.2,43.5L11.1,42.6L8.9,41.6L6.8,40.2L4.8,38.5L3.3,36.5L2.3,34.3L2.0,32.0L2.3,29.7L3.3,27.5L4.8,25.5L6.8,23.8L8.9,22.4L11.1,21.4L13.2,20.5L15.0,19.7L16.6,18.9L17.9,17.9L18.9,16.6L19.7,15.0L20.5,13.2L21.4,11.1L22.4,8.9L23.8,6.8L25.5,4.8L27.5,3.3L29.7,2.3Z";
       const SHAPE_6 =
@@ -445,20 +445,18 @@ function runThemeEngines(theme) {
         });
       });
 
-      const greetingEl = document.getElementById("greeting");
-       if (greetingEl) {
-         const username = config.username?.trim() || "user";
-         greetingEl.textContent = `welcome back, ${username}.`;
+      function updateTsukihiGreeting() {
+        const greetingEl = document.getElementById("greeting");
+        if (greetingEl) {
+          const username = config.username?.trim() || "user";
+          greetingEl.textContent = `welcome back, ${username}.`;
         }
-
-      
-      const greetingEl = document.getElementById("greeting");
-      if (greetingEl) {
-        const username = config.username?.trim() || "user";
-        greetingEl.textContent = `welcome back, ${username}.`;
       }
-      
+
+      updateTsukihiGreeting();
+      setInterval(updateTsukihiGreeting, 60000);
       break;
+    }
 
     case "shinobu":
       function createShinobuEmbers() {

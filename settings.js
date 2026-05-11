@@ -200,13 +200,13 @@ const SETTINGS_CSS = `
 }
 
 #settings-shell .theme-grid button {
-  padding: 8px 6px;
+  padding: 10px 8px;
   border: 2px solid var(--ui-outline);
   background: var(--ui-bg);
   color: var(--ui-text);
   cursor: pointer;
   font-family: "Space Grotesk", sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
   transition: all 0.1s;
@@ -328,17 +328,22 @@ const SETTINGS_HTML = `
       </section>
 
       <section>
-        <label>
-          <input type="checkbox" id="pref-use-12-hour-clock" />
-          12-hour clock
-        </label>
-      </section>
-
-      <section>
-        <label>
-          <input type="checkbox" id="pref-use-fahrenheit" />
-          Use Fahrenheit
-        </label>
+        <div class="geo-inputs">
+          <div style="flex: 1;">
+            <label>Time Format</label>
+            <select id="pref-use-12-hour-clock">
+              <option value="false">24-hour Clock</option>
+              <option value="true">12-hour Clock</option>
+            </select>
+          </div>
+          <div style="flex: 1;">
+            <label>Temperature Unit</label>
+            <select id="pref-use-fahrenheit">
+              <option value="false">Celsius (°C)</option>
+              <option value="true">Fahrenheit (°F)</option>
+            </select>
+          </div>
+        </div>
       </section>
 
       <div class="section-header" style="margin-top: 20px;">
@@ -549,12 +554,11 @@ class SettingsMenu {
     document.getElementById("pref-lat").value = config.location?.lat ?? 0;
     document.getElementById("pref-lon").value = config.location?.lon ?? 0;
 
-    document.getElementById("pref-use-12-hour-clock").checked =
-        config.use12HourClock === true;
+    document.getElementById("pref-use-12-hour-clock").value =
+      config.use12HourClock === true ? "true" : "false";
 
-    document.getElementById("pref-use-fahrenheit").checked =
-          config.useFahrenheit === true;
-
+    document.getElementById("pref-use-fahrenheit").value =
+      config.useFahrenheit === true ? "true" : "false";
 
     document.getElementById("pref-tsukihi-mode").value =
       config.tsukihiMode || "auto";
@@ -614,13 +618,11 @@ class SettingsMenu {
     config.location.lat = parseFloat(document.getElementById("pref-lat").value);
     config.location.lon = parseFloat(document.getElementById("pref-lon").value);
 
-    config.use12HourClock = document.getElementById(
-      "pref-use-12-hour-clock",
-    ).checked;
+    config.use12HourClock =
+      document.getElementById("pref-use-12-hour-clock").value === "true";
 
-    config.useFahrenheit = document.getElementById(
-        "pref-use-fahrenheit",
-    ).checked;
+    config.useFahrenheit =
+      document.getElementById("pref-use-fahrenheit").value === "true";
 
     config.tsukihiMode = document.getElementById("pref-tsukihi-mode").value;
     config.karenMode = document.getElementById("pref-karen-mode").value;
