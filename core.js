@@ -64,7 +64,10 @@ const wxIcons = {
 window.state = {
   config: {
     username: "user",
-    location: { lat: 43.653, lon: -79.383 },
+        location: { lat: 43.653, lon: -79.383 },
+    use12HourClock: false,
+    useFahrenheit: false,
+
     shortcuts: [
       {
         label: "Quercus",
@@ -441,6 +444,13 @@ function runThemeEngines(theme) {
           }
         });
       });
+
+      const greetingEl = document.getElementById("greeting");
+       if (greetingEl) {
+         const username = config.username?.trim() || "user";
+         greetingEl.textContent = `welcome back, ${username}.`;
+        }
+
       
       const greetingEl = document.getElementById("greeting");
       if (greetingEl) {
@@ -564,15 +574,29 @@ function applyShinobuMode() {
 
 function updateClock() {
   const now = new Date();
-  const hours = now.getHours().toString().padStart(2, "0");
   const minutes = now.getMinutes().toString().padStart(2, "0");
   const year = now.getFullYear();
   const month = (now.getMonth() + 1).toString().padStart(2, "0");
   const day = now.getDate().toString().padStart(2, "0");
 
+  const use12HourClock = window.state?.config?.use12HourClock === true;
+
+  let clockText;
+
+  if (use12HourClock) {
+    let hours = now.getHours();
+    const ampm = hours >= 12 ? "PM" : "AM";
+
+    hours = hours % 12 || 12;
+    clockText = `${hours}:${minutes} ${ampm}`;
+  } else {
+    const hours = now.getHours().toString().padStart(2, "0");
+    clockText = `${hours}:${minutes}`;
+  }
+
   document
     .querySelectorAll("#clock")
-    .forEach((el) => (el.textContent = `${hours}:${minutes}`));
+    .forEach((el) => (el.textContent = clockText));
 
   document.querySelectorAll("#date").forEach((el) => {
     const theme =
@@ -604,24 +628,47 @@ function getWxIcon(code, isDay) {
 async function updateWeather() {
   const cacheStr = localStorage.getItem(WEATHER_CACHE_KEY);
   const now = Date.now();
+  const useFahrenheit = window.state?.config?.useFahrenheit === true;
+  const weatherUnit = useFahrenheit ? "fahrenheit" : "celsius";
 
-  if (cacheStr) {
+if (cacheStr) {
     try {
-      const cache = JSON.parse(cacheStr);
-      const isSameLoc =
-        cache.lat === window.state.config.location.lat &&
-        cache.lon === window.state.config.location.lon;
-      if (now - cache.timestamp < 900000 && isSameLoc) {
-        applyGlobalWeather(cache.temp, cache.code, cache.isDay);
-        return;
-      }
-    } catch (e) {}
-  }
+        const cache = JSON.parse(cacheStr);
+
+        const isSameLoc =
+            cache.lat === window.state.config.location.lat &&
+            cache.lon === window.state.config.location.lon;
+
+        const useFahrenheit =
+            window.state?.config?.useFahrenheit === true;
+
+        const weatherUnit = useFahrenheit
+            ? "fahrenheit"
+            : "celsius";
+
+        const isSameUnit = cache.unit === weatherUnit;
+
+        if (
+            now - cache.timestamp < 900000 &&
+            isSameLoc &&
+            isSameUnit
+        ) {
+            applyGlobalWeather(cache.temp, cache.code, cache.isDay);
+            return;
+        }
+    } catch (e) { }
+}
 
   try {
     const { lat, lon } = window.state.config.location;
+
+    const useFahrenheit = window.state?.config?.useFahrenheit === true;
+    const temperatureUnit = useFahrenheit
+        ? "&temperature_unit=fahrenheit"
+        : "";
+
     const res = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,is_day&timezone=auto`,
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,is_day${temperatureUnit}&timezone=auto`,
     );
     if (!res.ok) throw new Error("Weather API Error");
 
@@ -632,7 +679,15 @@ async function updateWeather() {
 
     localStorage.setItem(
       WEATHER_CACHE_KEY,
-      JSON.stringify({ temp, code, isDay, timestamp: now, lat, lon }),
+        JSON.stringify({
+            temp,
+            code,
+            isDay,
+            timestamp: now,
+            lat,
+            lon,
+            unit: useFahrenheit ? "fahrenheit" : "celsius",
+        }),
     );
     applyGlobalWeather(temp, code, isDay);
   } catch (err) {
@@ -654,7 +709,8 @@ function applyGlobalWeather(temp, code, isDay) {
       el.innerHTML.includes("<span")
     )
       return;
-    el.textContent = temp === "ERR" ? temp : `${temp}°C`;
+    const unit = window.state?.config?.useFahrenheit ? "°F" : "°C";
+    el.textContent = temp === "ERR" ? temp : `${temp}${unit}`;
   });
 
   const iconEls = document.querySelectorAll("#wx-icon");

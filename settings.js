@@ -327,6 +327,20 @@ const SETTINGS_HTML = `
         </div>
       </section>
 
+      <section>
+        <label>
+          <input type="checkbox" id="pref-use-12-hour-clock" />
+          12-hour clock
+        </label>
+      </section>
+
+      <section>
+        <label>
+          <input type="checkbox" id="pref-use-fahrenheit" />
+          Use Fahrenheit
+        </label>
+      </section>
+
       <div class="section-header" style="margin-top: 20px;">
         LINKS <span>SHORTCUTS</span>
       </div>
@@ -535,6 +549,13 @@ class SettingsMenu {
     document.getElementById("pref-lat").value = config.location?.lat ?? 0;
     document.getElementById("pref-lon").value = config.location?.lon ?? 0;
 
+    document.getElementById("pref-use-12-hour-clock").checked =
+        config.use12HourClock === true;
+
+    document.getElementById("pref-use-fahrenheit").checked =
+          config.useFahrenheit === true;
+
+
     document.getElementById("pref-tsukihi-mode").value =
       config.tsukihiMode || "auto";
     document.getElementById("pref-karen-mode").value =
@@ -592,6 +613,15 @@ class SettingsMenu {
     config.username = document.getElementById("pref-username").value;
     config.location.lat = parseFloat(document.getElementById("pref-lat").value);
     config.location.lon = parseFloat(document.getElementById("pref-lon").value);
+
+    config.use12HourClock = document.getElementById(
+      "pref-use-12-hour-clock",
+    ).checked;
+
+    config.useFahrenheit = document.getElementById(
+        "pref-use-fahrenheit",
+    ).checked;
+
     config.tsukihiMode = document.getElementById("pref-tsukihi-mode").value;
     config.karenMode = document.getElementById("pref-karen-mode").value;
     config.mayoiMode = document.getElementById("pref-mayoi-mode").value;
